@@ -418,7 +418,8 @@ services.
                 //array of maps for meta data of rids .. [{rid : id},..}  
       "rids": [ 
                  "b507901x1.prod",// adams wrangler version. 
-                "b507901x3.prod" // adams pds version
+                "b507901x3.prod", // adams pds version
+                "b16x29.prod" // picologging 
                  //"a169x625"
               ],
       "channels" : [{
