@@ -514,10 +514,10 @@ operationCount = function() {
 
 // create child from protype will take the name with a option of a prototype with a default to base.
   createChild = defaction(name){ 
-    configure using protype_name = "base"; // base must be installed by default for prototypeing to work 
+    configure using prototype_name = "base"; // base must be installed by default for prototypeing to work 
     results = prototypes(); // get prototype from ent varible and default to base if not found.
     prototypes = results{"prototypes"};
-    prototype = prototypes{protype_name}.defaultsTo(basePrototype,"prototype not found").klog("prototype: ");
+    prototype = prototypes{prototype_name}.defaultsTo(basePrototype,"prototype not found").klog("prototype: ");
     rids = prototype{"rids"};
     // create child and give name
     attributes = {
@@ -527,6 +527,7 @@ operationCount = function() {
     // create child 
     newPicoInfo = pci:new_pico(meta:eci()); // we need pci updated to take a name.
     newPicoEci = newPicoInfo{"cid"};// store child eci
+    nonsense = newPicoEci.pset(ent:lastCreatedPicoEci); // store pico eci in magic varible for use to turn on logging at creation. will change when defaction setting varible is implemented.
     // store name
     child_rec = {"name": name,
                  "eci": newPicoEci
@@ -1018,7 +1019,9 @@ operationCount = function() {
 
    // if(checkPicoName(name)) then 
     {
-      createChild(name) with protype_name = prototype; 
+      createChild(name) with prototype_name = prototype; 
+      event:send({"eci":ent:lastCreatedPicoEci}, "picolog", "reset") // event to child to turn on logging, this uses a magic varible that will be replaced after defaction varible setting is implemented
+      with attrs = attributes;
     }
     fired {
       log(standardOut("pico created with name #{name}"));
