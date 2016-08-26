@@ -1020,8 +1020,7 @@ operationCount = function() {
    // if(checkPicoName(name)) then 
     {
       createChild(name) with prototype_name = prototype; 
-      event:send({"cid":ent:lastCreatedPicoEci}, "picolog", "reset") // event to child to turn on logging, this uses a magic varible that will be replaced after defaction varible setting is implemented
-      with attrs = attributes;
+      event:send({"cid":ent:lastCreatedPicoEci}, "picolog", "reset"); // event to child to turn on logging, this uses a magic varible that will be replaced after defaction varible setting is implemented
     }
     fired {
       log(standardOut("pico created with name #{name}"));
