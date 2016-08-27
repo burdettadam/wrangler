@@ -419,7 +419,7 @@ services.
       "rids": [ 
                  "b507901x1.prod",// adams wrangler version. 
                 "b507901x3.prod", // adams pds version
-                "b16x29.prod" // picologging 
+                "b16x29.prod" // picologging
                  //"a169x625"
               ],
       "channels" : [{
@@ -541,8 +541,9 @@ operationCount = function() {
     //combine new_ruleset calls 
     joined_rids_to_install = prototype_name eq "base" =>  basePrototype{"rids"}  |   basePrototype{"rids"}.append(rids);
     a = pci:new_ruleset(newPicoEci,joined_rids_to_install.klog('rids to be installed in child: ')); // install base/prototype rids (bootstrap child) 
-    // update child ent:prototype_at_creation with prototype
-    event:send({"cid":newPicoEci}, "wrangler", "create_prototype") // event to child to handle prototype creation 
+    // update child ent:prototype_at_creation with prototype // we will put a rule in between to start logging in child.
+  //  event:send({"cid":newPicoEci}, "wrangler", "child_creation_started") // event to child to handle prototype creation 
+    event:send({"cid":meta:eci()}, "wrangler", "child_creation_started") // event to child to turn on logging in child 
       with attrs = attributes;
   }
 
@@ -1021,7 +1022,6 @@ operationCount = function() {
    // if(checkPicoName(name)) then 
     {
       createChild(name) with prototype_name = prototype; 
-      event:send({"cid":ent:lastCreatedPicoEci}, "picolog", "reset"); // event to child to turn on logging, this uses a magic varible that will be replaced after defaction varible setting is implemented
     }
     fired {
       log(standardOut("pico created with name #{name}"));
@@ -1030,7 +1030,22 @@ operationCount = function() {
       error warn " douplicate Pico name, failed to create pico named "+name;
     }
   }
-   
+
+  rule createChilded { 
+    select when wrangler child_creation_started
+    pre {
+      attributes = event:attrs();
+    }
+    {
+      event:send({"cid":ent:lastCreatedPicoEci}, "picolog", "reset"); // event to child to turn on logging, this uses a magic varible that will be replaced after defaction varible setting is implemented
+      event:send({"cid":ent:lastCreatedPicoEci}, "wrangler", "create_prototype") // event to child to handle prototype creation 
+      with attrs = attributes;
+    }
+    always {
+      log(standardOut("pico prototype initialized"));
+    }
+  }
+  
   rule initializePrototype { 
     select when wrangler create_prototype //raised from parent in new child
     pre {
