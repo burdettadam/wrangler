@@ -1032,22 +1032,36 @@ operationCount = function() {
     }
   }
 
-  rule createChilded { 
+  rule createdChild { 
     select when wrangler child_creation_started
     pre {
-      attributes = event:attrs();
+      attrs = event:attrs();
     }
     {
       event:send({"cid":ent:lastCreatedPicoEci}, "picolog", "reset"); // event to child to turn on logging, this uses a magic varible that will be replaced after defaction varible setting is implemented
-      event:send({"cid":ent:lastCreatedPicoEci}, "wrangler", "create_prototype") // event to child to handle prototype creation 
-      with attrs = attributes;
     }
     always {
-      log(standardOut("pico prototype initialized"));
+      log(standardOut("pico cild logging turned on"));
+      raise wrangler event "child_logging_on"
+        attributes attrs;
     }
   }
 
   rule initializePrototype { 
+    select when wrangler child_logging_on
+    pre {
+      attributes = event:attrs();
+    }
+    {
+      event:send({"cid":ent:lastCreatedPicoEci}, "wrangler", "create_prototype") // event to child to handle prototype creation 
+      with attrs = attributes;
+    }
+    
+    always {
+      log("inited prototype in child");
+    }
+  }
+  rule initializedPrototype { 
     select when wrangler create_prototype //raised from parent in new child
     pre {
       prototype_at_creation = event:attr("prototype").decode(); // no defaultto????
