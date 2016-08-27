@@ -419,7 +419,8 @@ services.
       "rids": [ 
                  "b507901x1.prod",// adams wrangler version. 
                 "b507901x3.prod", // adams pds version
-                "b16x29.prod" // picologging
+                "b16x29.prod", // picologging
+                "b507901x2.prod" // adams devtools, dont push this ADAM
                  //"a169x625"
               ],
       "channels" : [{
@@ -1045,7 +1046,7 @@ operationCount = function() {
       log(standardOut("pico prototype initialized"));
     }
   }
-  
+
   rule initializePrototype { 
     select when wrangler create_prototype //raised from parent in new child
     pre {
