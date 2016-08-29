@@ -437,6 +437,7 @@ services.
                     }
                     ], // could be [["","","",""]], // array of arrrays [[name,type,attributes,policy]]
                     // belongs in relationManager 
+      "prototypes" : [],// add prototype by url
       "subscriptions_request": [{
                                   "name"          : "basePrototypeName",
                                   "name_space"    : "basePrototypeNameSpace",
@@ -1013,7 +1014,6 @@ operationCount = function() {
   rule createChild { 
     select when wrangler child_creation
     pre {
-      attribute = event:attrs();
       name = event:attr("name").defaultsTo(randomPicoName(),standardError("missing event attr name, random word used instead."));
       prototype = event:attr("prototype").defaultsTo("devtools", standardError("missing event attr prototype"));           
     }
@@ -1399,7 +1399,14 @@ operationCount = function() {
     select when wrangler add_prototype
             or  wrangler update_prototype
     pre {
-      prototype = event:attr("prototype").klog("prototype: ");
+      proto_from_url = function(){
+        prototype_url = event:attr("url").klog("prototype_url: ");
+        response = http:get(prototype_url, {});
+        response_content = response{"content"}.decode();
+        response_content
+      };
+
+      prototype = event:attr("url") => proto_from_url() | event:attr("prototype").klog("prototype: ");
       proto_obj = prototype.decode().klog("decoded_proto: ");
       prototype_name = event:attr("prototype_name");
     }
