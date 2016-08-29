@@ -529,7 +529,6 @@ operationCount = function() {
     // create child 
     newPicoInfo = pci:new_pico(meta:eci()); // we need pci updated to take a name.
     newPicoEci = newPicoInfo{"cid"};// store child eci
-    nonsense = newPicoEci.pset(ent:lastCreatedPicoEci); // store pico eci in magic varible for use to turn on logging at creation. will change when defaction setting varible is implemented.
     // store name
     child_rec = {"name": name,
                  "eci": newPicoEci
@@ -542,9 +541,8 @@ operationCount = function() {
     //combine new_ruleset calls 
     joined_rids_to_install = prototype_name eq "base" =>  basePrototype{"rids"}  |   basePrototype{"rids"}.append(rids);
     a = pci:new_ruleset(newPicoEci,joined_rids_to_install.klog('rids to be installed in child: ')); // install base/prototype rids (bootstrap child) 
-    // update child ent:prototype_at_creation with prototype // we will put a rule in between to start logging in child.
-  //  event:send({"cid":newPicoEci}, "wrangler", "child_creation_started") // event to child to handle prototype creation 
-    event:send({"cid":meta:eci()}, "wrangler", "child_creation_started") // event to child to turn on logging in child 
+    // update child ent:prototype_at_creation with prototype
+    event:send({"cid":newPicoEci}, "wrangler", "create_prototype") // event to child to handle prototype creation 
       with attrs = attributes;
   }
 
@@ -1031,37 +1029,8 @@ operationCount = function() {
       error warn " douplicate Pico name, failed to create pico named "+name;
     }
   }
-
-  rule createdChild { 
-    select when wrangler child_creation_started
-    pre {
-      attrs = event:attrs();
-    }
-    {
-      event:send({"cid":ent:lastCreatedPicoEci}, "picolog", "reset"); // event to child to turn on logging, this uses a magic varible that will be replaced after defaction varible setting is implemented
-    }
-    always {
-      log(standardOut("pico cild logging turned on"));
-      raise wrangler event "child_logging_on"
-        attributes attrs;
-    }
-  }
-
+   
   rule initializePrototype { 
-    select when wrangler child_logging_on
-    pre {
-      attributes = event:attrs();
-    }
-    {
-      event:send({"cid":ent:lastCreatedPicoEci}, "wrangler", "create_prototype") // event to child to handle prototype creation 
-      with attrs = attributes;
-    }
-    
-    always {
-      log("inited prototype in child");
-    }
-  }
-  rule initializedPrototype { 
     select when wrangler create_prototype //raised from parent in new child
     pre {
       prototype_at_creation = event:attr("prototype").decode(); // no defaultto????
