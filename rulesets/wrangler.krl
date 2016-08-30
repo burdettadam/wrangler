@@ -1402,7 +1402,7 @@ operationCount = function() {
       proto_from_url = function(){
         prototype_url = event:attr("url").klog("prototype_url: ");
         response = http:get(prototype_url, {});
-        response_content = response{"content"}.decode();
+        response_content = response{"content"}.decode().klog("content decode: ");
         response_content
       };
 
