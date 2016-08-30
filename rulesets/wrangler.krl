@@ -1406,7 +1406,7 @@ operationCount = function() {
         response_content
       };
 
-      prototype = event:attr("url") => proto_from_url() | event:attr("prototype").klog("prototype: ");
+      prototype = event:attr("url").isnull() => event:attr("prototype").klog("prototype: ") | proto_from_url();
       proto_obj = prototype.decode().klog("decoded_proto: ");
       prototype_name = event:attr("prototype_name");
     }
