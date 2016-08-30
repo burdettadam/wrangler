@@ -437,7 +437,10 @@ services.
                     }
                     ], // could be [["","","",""]], // array of arrrays [[name,type,attributes,policy]]
                     // belongs in relationManager 
-      "prototypes" : [],// add prototype by url
+      "prototypes" : [{
+                      "url" : "https://raw.githubusercontent.com/burdettadam/Practice-with-KRL/master/prototype.json",
+                      "prototype_name": "base_add_test"
+                      }],// add prototype by url
       "subscriptions_request": [{
                                   "name"          : "basePrototypeName",
                                   "name_space"    : "basePrototypeNameSpace",
@@ -1069,7 +1072,7 @@ operationCount = function() {
       noop();
     }
     always {
-      log("init pds");
+      log("init channels");
       raise wrangler event "channel_creation_requested" 
             attributes attrs.klog("attributes : ")
     }
@@ -1086,8 +1089,25 @@ operationCount = function() {
       noop();
     }
     always {
-      log("init pds");
+      log("init subscription");
       raise wrangler event "subscription" 
+            attributes attrs.klog("attributes : ")
+    }
+  }
+
+// ---------------------- base Prototypes adding ----------------------
+  rule initializebasePrototypes {
+    select when wrangler init_events 
+      foreach basePrototype{'prototypes'}.klog("Prototype base add prototypes: ") setting (prototypes_url)
+    pre {
+      attrs = prototypes_url;
+    }
+    {
+      noop();
+    }
+    always {
+      log("init add prototypes");
+      raise wrangler event "add_prototype" 
             attributes attrs.klog("attributes : ")
     }
   }
@@ -1115,6 +1135,7 @@ operationCount = function() {
             attributes attrs.klog("attributes : ")
     }
   }
+
 // ---------------------- prototype subscription creation ----------------------
   rule initializePrototypeSubscriptions {
     select when wrangler init_events 
@@ -1131,6 +1152,24 @@ operationCount = function() {
             attributes attrs.klog("attributes : ")
     }
   }
+
+// ---------------------- base Prototypes adding ----------------------
+  rule initializePrototypePrototypes {
+    select when wrangler init_events 
+      foreach ent:prototypes{['at_creation','prototypes']}.klog("Prototype add prototypes: ") setting (prototypes_url)
+    pre {
+      attrs = prototypes_url;
+    }
+    {
+      noop();
+    }
+    always {
+      log("init add prototypes");
+      raise wrangler event "add_prototype" 
+            attributes attrs.klog("attributes : ");
+    }
+  }
+  
 // ********************************************************************************************
 // ***                                      PDS  Base Initializing                          ***
 // ********************************************************************************************
@@ -1402,12 +1441,12 @@ operationCount = function() {
       proto_from_url = function(){
         prototype_url = event:attr("url").klog("prototype_url: ");
         response = http:get(prototype_url, {});
-        response_content = response{"content"}.decode().klog("content decode: ");
+        response_content = response{"content"}.decode();
         response_content
       };
 
       prototype = event:attr("url").isnull() => event:attr("prototype").klog("prototype: ") | proto_from_url();
-      proto_obj = prototype.decode().klog("decoded_proto: ");
+      proto_obj = prototype.decode().klog("decoded_proto: "); // this decode is redundant, but the rule works so Im not messing with it.
       prototype_name = event:attr("prototype_name");
     }
     // should we always add something?
