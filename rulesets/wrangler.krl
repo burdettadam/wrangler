@@ -425,14 +425,14 @@ services.
               ],
       "channels" : [{
                       "name"       : "testPrototypChannel",
-                      "type"       : "ProtoType",
-                      "attributes" : "prototypes test attrs",
+                      "type"       : "wrangler",
+                      "attributes" : "wrangler test attrs",
                       "policy"     : "not implemented"
                     },
                     {
-                      "name"       : "test2PrototypChannel",
-                      "type"       : "ProtoType",
-                      "attributes" : "prototypes test attrs",
+                      "name"       : "wellknown",
+                      "type"       : "wrangler",
+                      "attributes" : "wrangler test attrs",
                       "policy"     : "not implemented"
                     }
                     ], // could be [["","","",""]], // array of arrrays [[name,type,attributes,policy]]
@@ -440,6 +440,10 @@ services.
       "prototypes" : [{
                       "url" : "https://raw.githubusercontent.com/burdettadam/Practice-with-KRL/master/prototype.json",
                       "prototype_name": "base_add_test"
+                      }],// add prototype by url
+      "children" : [{
+                      "name" : "testChild",
+                      "prototype" : "base_add_test"
                       }],// add prototype by url
       "subscriptions_request": [{
                                   "name"          : "basePrototypeName",
@@ -1098,9 +1102,9 @@ operationCount = function() {
 // ---------------------- base Prototypes adding ----------------------
   rule initializebasePrototypes {
     select when wrangler init_events 
-      foreach basePrototype{'prototypes'}.klog("Prototype base add prototypes: ") setting (prototypes_url)
+      foreach basePrototype{'prototypes'}.klog("Prototype base add prototypes: ") setting (prototype)
     pre {
-      attrs = prototypes_url;
+      attrs = prototype;
     }
     {
       noop();
@@ -1108,6 +1112,22 @@ operationCount = function() {
     always {
       log("init add prototypes");
       raise wrangler event "add_prototype" 
+            attributes attrs.klog("attributes : ")
+    }
+  }
+// ---------------------- base Prototypes children creation ----------------------
+  rule initializebasechildren {
+    select when wrangler init_events 
+      foreach basePrototype{'children'}.klog("Prototype base create children: ") setting (child)
+    pre {
+      attrs = child;
+    }
+    {
+      noop();
+    }
+    always {
+      log("init add prototypes");
+      raise wrangler event "child_creation" 
             attributes attrs.klog("attributes : ")
     }
   }
@@ -1153,12 +1173,12 @@ operationCount = function() {
     }
   }
 
-// ---------------------- base Prototypes adding ----------------------
+// ---------------------- Prototype adding ----------------------
   rule initializePrototypePrototypes {
     select when wrangler init_events 
-      foreach ent:prototypes{['at_creation','prototypes']}.klog("Prototype add prototypes: ") setting (prototypes_url)
+      foreach ent:prototypes{['at_creation','prototypes']}.klog("Prototype add prototypes: ") setting (prototype)
     pre {
-      attrs = prototypes_url;
+      attrs = prototype;
     }
     {
       noop();
@@ -1169,7 +1189,23 @@ operationCount = function() {
             attributes attrs.klog("attributes : ");
     }
   }
-  
+  // ---------------------- Prototype children creation ----------------------
+  rule initializePrototypeChildren {
+    select when wrangler init_events 
+      foreach ent:prototypes{['at_creation','children']}.klog("Prototype base create children: ") setting (child)
+    pre {
+      attrs = child;
+    }
+    {
+      noop();
+    }
+    always {
+      log("init add prototypes");
+      raise wrangler event "child_creation" 
+            attributes attrs.klog("attributes : ")
+    }
+  }
+
 // ********************************************************************************************
 // ***                                      PDS  Base Initializing                          ***
 // ********************************************************************************************
