@@ -1082,23 +1082,6 @@ operationCount = function() {
     }
   }
 
-// ---------------------- base subscription creation ----------------------
-  rule initializebaseSubscriptions {
-    select when wrangler init_events 
-      foreach basePrototype{'subscriptions_request'}.klog("Prototype base subscriptions_request: ") setting (subscription)
-    pre {
-      attrs = subscription;
-    }
-    {
-      noop();
-    }
-    always {
-      log("init subscription");
-      raise wrangler event "subscription" 
-            attributes attrs.klog("attributes : ")
-    }
-  }
-
 // ---------------------- base Prototypes adding ----------------------
   rule initializebasePrototypes {
     select when wrangler init_events 
@@ -1131,6 +1114,46 @@ operationCount = function() {
             attributes attrs.klog("attributes : ")
     }
   }
+
+// ---------------------- base subscription creation ----------------------
+  rule initializebaseSubscriptions {
+    select when wrangler init_events 
+      foreach basePrototype{'subscriptions_request'}.klog("Prototype base subscriptions_request: ") setting (subscription)
+    pre {
+      getRootEci = function (eci){
+        results = pci:list_parent(eci);
+        myParent = results{"parent"};
+        //myParentEci = myParent[0];
+        myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0]) | eci ;
+        myRooteci;
+      };
+      root_eci = getRootEci(meta:eci());
+      getTargetEci = function (path, eci) {
+        return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
+        children = return{"children"};
+        child_name = path.head().klog("child_name: ");
+        child_objects  = children.filter( function(child) {child{"name"} eq child_name});
+        child_object = child_objects[0];
+        child_eci  = (child_object{"name"} eq child_name) => "error" | child_object{"eci"};
+        new_path = path.tail();
+        target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
+        target_eci;
+      };
+      attrs = subscription;
+      target = attrs{"subscriber_eci"};
+      target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
+      attr = attrs.put({"subscriber_eci" : target_eci}).klog("target_eci: "); // over write original status
+    }
+    {
+      noop();
+    }
+    always {
+      log("init subscription");
+      raise wrangler event "subscription" 
+            attributes attr.klog("attributes : ")
+    }
+  }
+
 // ********************************************************************************************
 // ***                                      Prototype Depandancies                          ***
 // ********************************************************************************************
@@ -1152,23 +1175,6 @@ operationCount = function() {
     always {
       log("init pds");
       raise wrangler event "channel_creation_requested" 
-            attributes attrs.klog("attributes : ")
-    }
-  }
-
-// ---------------------- prototype subscription creation ----------------------
-  rule initializePrototypeSubscriptions {
-    select when wrangler init_events 
-      foreach ent:prototypes{['at_creation','subscriptions_request']}.klog("Prototype subscriptions_request: ") setting (subscription)
-    pre {
-      attrs = subscription;
-    }
-    {
-      noop();
-    }
-    always {
-      log("init pds");
-      raise wrangler event "subscription" 
             attributes attrs.klog("attributes : ")
     }
   }
@@ -1203,6 +1209,45 @@ operationCount = function() {
       log("init add prototypes");
       raise wrangler event "child_creation" 
             attributes attrs.klog("attributes : ")
+    }
+  }
+
+// ---------------------- prototype subscription creation ----------------------
+  rule initializePrototypeSubscriptions {
+    select when wrangler init_events 
+      foreach ent:prototypes{['at_creation','subscriptions_request']}.klog("Prototype subscriptions_request: ") setting (subscription)
+    pre {
+      getRootEci = function (eci){
+        results = pci:list_parent(eci);
+        myParent = results{"parent"};
+        //myParentEci = myParent[0];
+        myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0]) | eci ;
+        myRooteci;
+      };
+      root_eci = getRootEci(meta:eci());
+      getTargetEci = function (path, eci) {
+        return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
+        children = return{"children"};
+        child_name = path.head().klog("child_name: ");
+        child_objects  = children.filter( function(child) {child{"name"} eq child_name});
+        child_object = child_objects[0];
+        child_eci  = (child_object{"name"} eq child_name) => "error" | child_object{"eci"};
+        new_path = path.tail();
+        target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
+        target_eci;
+      };
+      attrs = subscription;
+      target = attrs{"subscriber_eci"};
+      target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
+      attr = attrs.put({"subscriber_eci" : target_eci}).klog("target_eci: "); // over write original status
+    }
+    {
+      noop();
+    }
+    always {
+      log("init subscription");
+      raise wrangler event "subscription" 
+            attributes attr.klog("attributes : ")
     }
   }
 
