@@ -1134,12 +1134,11 @@ operationCount = function() {
         //myParentEci = myParent[0];
         a = child_eci.klog("child_eci: ");
         myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null).klog("name() :"); //return child name
-        name = myRooteci{"picoName"}.klog("name :");
-        name;
-        
+        myRooteci
       };
 
-      Oedipus = getOedipus(meta:eci()).klog("Oedipus: ");
+      Oedipus_results = getOedipus(meta:eci()).klog("Oedipus: ");
+      Oedipus = Oedipus_results{"picoName"};
       root_eci = getRootEci(meta:eci()).klog("root_eci: ");
 
       getTargetEci = function (path, eci) {
@@ -1247,13 +1246,13 @@ operationCount = function() {
         //myParentEci = myParent[0];
         a = child_eci.klog("child_eci: ");
         myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null).klog("name() :"); //return child name
-        name = myRooteci{"picoName"}.klog("name :");
-        name;
-        
+        myRooteci
       };
 
-      Oedipus = getOedipus(meta:eci()).klog("Oedipus: ");
+      Oedipus_results = getOedipus(meta:eci()).klog("Oedipus: ");
+      Oedipus = Oedipus_results{"picoName"};
       root_eci = getRootEci(meta:eci()).klog("root_eci: ");
+
 
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
