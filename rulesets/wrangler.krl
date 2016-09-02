@@ -1153,6 +1153,7 @@ operationCount = function() {
         target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
       };
+      
       attrs = subscription;
       target = attrs{"subscriber_eci"};
       target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
