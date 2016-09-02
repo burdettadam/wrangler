@@ -1122,8 +1122,8 @@ operationCount = function() {
       foreach basePrototype{'subscriptions_request'}.klog("Prototype base subscriptions_request: ") setting (subscription)
     pre {
       getRootEci = function (eci){
-        results = pci:list_parent(eci);
-        myParent = results{"parent"};
+        results = pci:list_parent(eci).klog("parents: ");
+        myParent = results{"parent"}.klog("parent: ");
         //myParentEci = myParent[0];
         myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0]) | eci ;
         myRooteci;
