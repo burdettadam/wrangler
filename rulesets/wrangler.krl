@@ -1137,8 +1137,8 @@ operationCount = function() {
         myRooteci;
       };
 
-      Oedipus = getOedipus(meta:eci());
-      root_eci = getRootEci(meta:eci());
+      Oedipus = getOedipus(meta:eci()).klog("Oedipus: ");
+      root_eci = getRootEci(meta:eci()).klog("root_eci: ");
 
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
@@ -1153,7 +1153,7 @@ operationCount = function() {
         target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
       };
-      
+
       attrs = subscription;
       target = attrs{"subscriber_eci"};
       target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
