@@ -1136,6 +1136,7 @@ operationCount = function() {
         myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null).klog("name() :"); //return child name
         name = myRooteci{"picoName"}.klog("name :");
         name;
+        
       };
 
       Oedipus = getOedipus(meta:eci()).klog("Oedipus: ");
