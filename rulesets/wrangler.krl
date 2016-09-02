@@ -1024,7 +1024,6 @@ operationCount = function() {
       name = event:attr("name").defaultsTo(randomPicoName(),standardError("missing event attr name, random word used instead."));
       prototype = event:attr("prototype").defaultsTo("devtools", standardError("missing event attr prototype"));           
     }
-
    // if(checkPicoName(name)) then 
     {
       createChild(name) with prototype_name = prototype; 
@@ -1224,11 +1223,24 @@ operationCount = function() {
         myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0]) | eci ;
         myRooteci;
       };
+
+      getOedipus = function (eci,child_eci){
+        results = pci:list_parent(eci);
+        myParent = results{"parent"};
+        //myParentEci = myParent[0];
+        myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0],eci) | skyQuery(eci,"b507901x1.prod","name",{},null,null,null); //return child name
+        myRooteci;
+      };
+      
+      Oedipus = getOedipus(meta:eci());
       root_eci = getRootEci(meta:eci());
+
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
         children = return{"children"};
-        child_name = path.head().klog("child_name: ");
+        child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
+        child_name_look_up = (channel_name eq "__Oedipus_") => name() | child_name; // use pico 
+        child_name = child_name_look_up;
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
         child_object = child_objects[0];
         child_eci  = (child_object{"name"} eq child_name) => "error" | child_object{"eci"};
