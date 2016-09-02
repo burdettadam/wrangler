@@ -1130,10 +1130,10 @@ operationCount = function() {
       };
 
       getOedipus = function (eci,child_eci){
-        myParent = pci:list_parent(eci);
+        myParent = pci:list_parent(eci).klog("Oedipus Parent: ");
         //myParentEci = myParent[0];
-        myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(eci,"b507901x1.prod","name",{},null,null,null); //return child name
-        myRooteci;
+        myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null); //return child name
+        myRooteci{"picoName"};
       };
 
       Oedipus = getOedipus(meta:eci()).klog("Oedipus: ");
