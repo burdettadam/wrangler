@@ -1138,14 +1138,15 @@ operationCount = function() {
       };
 
       Oedipus_results = getOedipus(meta:eci()).klog("Oedipus: ");
-      Oedipus = Oedipus_results{"picoName"};
+      Oedipus = Oedipus_results{"picoName"}.klog("Oedipus_name");
       root_eci = getRootEci(meta:eci()).klog("root_eci: ");
+
 
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
         children = return{"children"};
         child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
-        child_name_look_up = (channel_name eq "__Oedipus_") => Oedipus | child_name; // use pico 
+        child_name_look_up = (child_name eq "__Oedipus_").klog("is Oedipus? ") => Oedipus | child_name; // use pico 
         child_name = child_name_look_up.klog("child_name after Oedipus: ");
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
         child_object = child_objects[0].klog("child_object");
@@ -1258,7 +1259,7 @@ operationCount = function() {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
         children = return{"children"};
         child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
-        child_name_look_up = (channel_name eq "__Oedipus_").klog("is Oedipus? ") => Oedipus | child_name; // use pico 
+        child_name_look_up = (child_name eq "__Oedipus_").klog("is Oedipus? ") => Oedipus | child_name; // use pico 
         child_name = child_name_look_up.klog("child_name after Oedipus: ");
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
         child_object = child_objects[0].klog("child_object");
