@@ -441,10 +441,12 @@ services.
                       "url" : "https://raw.githubusercontent.com/burdettadam/Practice-with-KRL/master/prototype.json",
                       "prototype_name": "base_add_test"
                       }],// add prototype by url
-      "children" : [{
+      "children" : [
+                    /*{
                       "name" : "testChild",
                       "prototype" : "base_add_test"
-                      }],// add prototype by url
+                      }*/
+                      ],// add prototype by url
       "subscriptions_request": [{
                                   "name"          : "basePrototypeName",
                                   "name_space"    : "basePrototypeNameSpace",
@@ -1231,7 +1233,7 @@ operationCount = function() {
         myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0],eci) | skyQuery(eci,"b507901x1.prod","name",{},null,null,null); //return child name
         myRooteci;
       };
-      
+
       Oedipus = getOedipus(meta:eci());
       root_eci = getRootEci(meta:eci());
 
