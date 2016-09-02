@@ -1235,37 +1235,40 @@ operationCount = function() {
       foreach ent:prototypes{['at_creation','subscriptions_request']}.klog("Prototype subscriptions_request: ") setting (subscription)
     pre {
       getRootEci = function (eci){
-        results = pci:list_parent(eci);
-        myParent = results{"parent"};
+        results = pci:list_parent(eci).klog("parent: ");
+        //myParent = results{"parent"}.klog("parent: ");
         //myParentEci = myParent[0];
-        myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0]) | eci ;
+        myRooteci = (results.typeof() eq "array") => getRootEci(results[0]) | eci ;
         myRooteci;
       };
 
       getOedipus = function (eci,child_eci){
-        results = pci:list_parent(eci);
-        myParent = results{"parent"};
+        myParent = pci:list_parent(eci).klog("Oedipus Parent: ");
         //myParentEci = myParent[0];
-        myRooteci = (myParent.typeof() eq "array") => getRootEci(myParent[0],eci) | skyQuery(eci,"b507901x1.prod","name",{},null,null,null); //return child name
-        myRooteci;
+        a = child_eci.klog("child_eci: ");
+        myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null).klog("name() :"); //return child name
+        name = myRooteci{"picoName"}.klog("name :");
+        name;
+        
       };
 
-      Oedipus = getOedipus(meta:eci());
-      root_eci = getRootEci(meta:eci());
+      Oedipus = getOedipus(meta:eci()).klog("Oedipus: ");
+      root_eci = getRootEci(meta:eci()).klog("root_eci: ");
 
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
-        children = return{"children"}.klog("children: ");
+        children = return{"children"};
         child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
-        child_name_look_up = (channel_name eq "__Oedipus_") => name() | child_name; // use pico 
-        child_name = child_name_look_up;
+        child_name_look_up = (channel_name eq "__Oedipus_") => Oedipus | child_name; // use pico 
+        child_name = child_name_look_up.klog("child_name after Oedipus: ");
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
-        child_object = child_objects[0];
+        child_object = child_objects[0].klog("child_object");
         child_eci  = (child_object{"name"} eq child_name) => "error" | child_object{"eci"};
-        new_path = path.tail();
+        new_path = path.tail().klog("new_path: ");
         target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
       };
+
       attrs = subscription;
       target = attrs{"subscriber_eci"};
       target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
