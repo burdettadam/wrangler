@@ -1144,12 +1144,12 @@ operationCount = function() {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
         children = return{"children"};
         child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
-        child_name_look_up = (channel_name eq "__Oedipus_") => name() | child_name; // use pico 
-        child_name = child_name_look_up;
+        child_name_look_up = (channel_name eq "__Oedipus_") => Oedipus | child_name; // use pico 
+        child_name = child_name_look_up.klog("child_name after Oedipus: ");
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
-        child_object = child_objects[0];
+        child_object = child_objects[0].klog("child_object");
         child_eci  = (child_object{"name"} eq child_name) => "error" | child_object{"eci"};
-        new_path = path.tail();
+        new_path = path.tail().klog("new_path: ");
         target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
       };
@@ -1252,7 +1252,7 @@ operationCount = function() {
 
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
-        children = return{"children"};
+        children = return{"children"}.klog("children: ");
         child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
         child_name_look_up = (channel_name eq "__Oedipus_") => name() | child_name; // use pico 
         child_name = child_name_look_up;
