@@ -1154,6 +1154,7 @@ operationCount = function() {
         new_path = path.klog("path :").tail().klog("new_path: ");
         target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
+        
       };
 
       attrs = subscription;
