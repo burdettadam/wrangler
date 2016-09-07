@@ -1150,8 +1150,8 @@ operationCount = function() {
         child_name = child_name_look_up.klog("child_name after Oedipus: ");
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
         child_object = child_objects[0].klog("child_object");
-        child_eci  = (child_object{"name"} eq child_name) => "error" | child_object{"eci"};
-        new_path = path.tail().klog("new_path: ");
+        child_eci  = (child_object{"name"} eq child_name) => "error" | child_object{"eci"}.klog("child_eci :");
+        new_path = path.klog("path :").tail().klog("new_path: ");
         target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
       };
@@ -1159,7 +1159,7 @@ operationCount = function() {
       attrs = subscription;
       target = attrs{"subscriber_eci"};
       target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
-      attr = attrs.put({"subscriber_eci" : target_eci}).klog("target_eci: "); // over write original status
+      attr = attrs.put({"subscriber_eci" : target_eci}).klog("target_eci: "); 
     }
     {
       noop();
