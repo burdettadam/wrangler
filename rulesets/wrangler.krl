@@ -440,7 +440,7 @@ services.
                       "prototype" : "base_add_test"
                       }*/
                       ],// add prototype by url
-      "subscriptions_request": [{
+      "subscriptions_request": [/*{
                                   "name"          : "parent-child",
                                   "name_space"    : "wrangler",
                                   "my_role"       : "child",
@@ -448,7 +448,7 @@ services.
                                   "subscriber_eci"    : ["owner"],
                                   "channel_type"  : "wrangler",
                                   "attrs"         : "nogiven"
-                                }],
+                                }*/],
       "Prototype_events" : [
                             /*{
                               'domain': 'wrangler',
