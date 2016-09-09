@@ -424,20 +424,13 @@ services.
                  //"a169x625"
               ],
       "channels" : [{
-                      "name"       : "testPrototypChannel",
-                      "type"       : "wrangler",
-                      "attributes" : "wrangler test attrs",
-                      "policy"     : "not implemented"
-                    },
-                    {
                       "name"       : "wellknown",
                       "type"       : "wrangler",
                       "attributes" : "wrangler test attrs",
                       "policy"     : "not implemented"
                     }
-                    ], // could be [["","","",""]], // array of arrrays [[name,type,attributes,policy]]
-                    // belongs in relationManager 
-      "prototypes" : [{
+                    ], // we could instead use tuples  [["","","",""]], // array of arrrays [[name,type,attributes,policy]]
+      "prototypes" : [{// belongs in relationManager 
                       "url" : "https://raw.githubusercontent.com/burdettadam/Practice-with-KRL/master/prototype.json",
                       "prototype_name": "base_add_test"
                       }],// add prototype by url
@@ -448,35 +441,22 @@ services.
                       }*/
                       ],// add prototype by url
       "subscriptions_request": [{
-                                  "name"          : "basePrototypeName",
-                                  "name_space"    : "basePrototypeNameSpace",
-                                  "my_role"       : "son",
-                                  "subscriber_role"     : "test",
-                                  "subscriber_eci"    : "1654165",
-                                  "channel_type"  : "ProtoType",
+                                  "name"          : "parent-child",
+                                  "name_space"    : "wrangler",
+                                  "my_role"       : "child",
+                                  "subscriber_role"     : "parent",
+                                  "subscriber_eci"    : ["owner"],
+                                  "channel_type"  : "wrangler",
                                   "attrs"         : "nogiven"
                                 }],
-      "Prototype_events" : [{
+      "Prototype_events" : [
+                            /*{
                               'domain': 'wrangler',
                               'type'  : 'base_prototype_event1',
                               'attrs' : {'attr1':'1',
                                           'attr2':'2'
                                         }
-                            },
-                            {
-                              'domain': 'wrangler',
-                              'type'  : 'base_prototype_event2',
-                              'attrs' : {'attr1':'1',
-                                          'attr2':'2'
-                                        }
-                            },
-                            {
-                              'domain': 'wrangler',
-                              'type'  : 'base_prototype_event3',
-                              'attrs' : {'attr1':'1',
-                                          'attr2':'2'
-                                        }
-                            }
+                            }*/
                             ], // array of maps
       "PDS" : {
                 "profile" : {
@@ -1122,45 +1102,41 @@ operationCount = function() {
       foreach basePrototype{'subscriptions_request'}.klog("Prototype base subscriptions_request: ") setting (subscription)
     pre {
       getRootEci = function (eci){
-        results = pci:list_parent(eci).klog("parent: ");
-        //myParent = results{"parent"}.klog("parent: ");
-        //myParentEci = myParent[0];
+        results = pci:list_parent(eci);
         myRooteci = (results.typeof() eq "array") => getRootEci(results[0]) | eci ;
         myRooteci;
       };
 
       getOedipus = function (eci,child_eci){
-        myParent = pci:list_parent(eci).klog("Oedipus Parent: ");
-        //myParentEci = myParent[0];
-        a = child_eci.klog("child_eci: ");
-        myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null).klog("name() :"); //return child name
+        myParent = pci:list_parent(eci);
+        a = child_eci;
+        myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null);
         myRooteci
       };
 
       Oedipus_results = getOedipus(meta:eci()).klog("Oedipus: ");
-      Oedipus = Oedipus_results{"picoName"}.klog("Oedipus_name: ");
+      Oedipus = Oedipus_results{"picoName"};
       root_eci = getRootEci(meta:eci()).klog("root_eci: ");
 
 
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
         children = return{"children"};
-        child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
-        child_name_look_up = (child_name eq "__Oedipus_").klog("is Oedipus? ") => Oedipus | child_name; // use pico 
-        child_name = child_name_look_up.klog("child_name after Oedipus: ");
+        child_name = path.head();
+        child_name_look_up = (child_name eq "__Oedipus_") => Oedipus | child_name;
+        child_name = child_name_look_up;
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
-        child_object = child_objects[0].klog("child_object");
-        child_eci  = (child_object{"name"} neq child_name) => "error" | child_object{"eci"}.klog("child_eci :");
+        child_object = child_objects[0];
+        child_eci  = (child_object{"name"} neq child_name) => "error" | child_object{"eci"};
         new_path = path.klog("path :").tail().klog("child_eci: #{child_eci},eci: #{eci},new_path: ");
-        target_eci = (path.length().klog("path_length: ") eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
+        target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
-
       };
 
       attrs = subscription;
       target = attrs{"subscriber_eci"};
       target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
-      attr = attrs.put({"subscriber_eci" : target_eci.klog("target_eci: ")}); // over write original status
+      attr = attrs.put({"subscriber_eci" : target_eci.klog("target_eci: ")}); 
     }
     {
       noop();
@@ -1236,45 +1212,41 @@ operationCount = function() {
       foreach ent:prototypes{['at_creation','subscriptions_request']}.klog("Prototype subscriptions_request: ") setting (subscription)
     pre {
       getRootEci = function (eci){
-        results = pci:list_parent(eci).klog("parent: ");
-        //myParent = results{"parent"}.klog("parent: ");
-        //myParentEci = myParent[0];
+        results = pci:list_parent(eci);
         myRooteci = (results.typeof() eq "array") => getRootEci(results[0]) | eci ;
         myRooteci;
       };
 
       getOedipus = function (eci,child_eci){
-        myParent = pci:list_parent(eci).klog("Oedipus Parent: ");
-        //myParentEci = myParent[0];
-        a = child_eci.klog("child_eci: ");
-        myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null).klog("name() :"); //return child name
+        myParent = pci:list_parent(eci);
+        a = child_eci;
+        myRooteci = (myParent.typeof() eq "array") => getOedipus(myParent[0],eci) | skyQuery(child_eci,"b507901x1.prod","name",{},null,null,null);
         myRooteci
       };
 
       Oedipus_results = getOedipus(meta:eci()).klog("Oedipus: ");
-      Oedipus = Oedipus_results{"picoName"}.klog("Oedipus_name: ");
+      Oedipus = Oedipus_results{"picoName"};
       root_eci = getRootEci(meta:eci()).klog("root_eci: ");
 
 
       getTargetEci = function (path, eci) {
         return = skyQuery(eci,"b507901x1.prod","children",{},null,null,null);
         children = return{"children"};
-        child_name = path.head().klog("child_name: ");// if child is eq __Oedipus_ 
-        child_name_look_up = (child_name eq "__Oedipus_").klog("is Oedipus? ") => Oedipus | child_name; // use pico 
-        child_name = child_name_look_up.klog("child_name after Oedipus: ");
+        child_name = path.head();
+        child_name_look_up = (child_name eq "__Oedipus_") => Oedipus | child_name;
+        child_name = child_name_look_up;
         child_objects  = children.filter( function(child) {child{"name"} eq child_name});
-        child_object = child_objects[0].klog("child_object");
-        child_eci  = (child_object{"name"} neq child_name) => "error" | child_object{"eci"}.klog("child_eci :");
+        child_object = child_objects[0];
+        child_eci  = (child_object{"name"} neq child_name) => "error" | child_object{"eci"};
         new_path = path.klog("path :").tail().klog("child_eci: #{child_eci},eci: #{eci},new_path: ");
-        target_eci = (path.length().klog("path_length: ") eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
+        target_eci = (path.length() eq 0 ) => eci | (child_eci eq "error") => child_eci | getTargetEci(new_path,child_eci) ;
         target_eci;
-
       };
 
       attrs = subscription;
       target = attrs{"subscriber_eci"};
       target_eci = ( target.typeof() eq "array" ) => getTargetEci(target.tail(),root_eci) | target ;
-      attr = attrs.put({"subscriber_eci" : target_eci.klog("target_eci: ")}); // over write original status
+      attr = attrs.put({"subscriber_eci" : target_eci.klog("target_eci: ")}); 
     }
     {
       noop();
@@ -1377,7 +1349,7 @@ operationCount = function() {
     }
   }
   */
-  rule initializePdsSettings {
+  rule initializePdsSettings { // limits to how many data varibles in a settings at creation exist....
     select when wrangler init_events
       foreach basePrototype{['PDS','settings']}.klog("PDS settings: ") setting (key_of_map) // for each "key" (rid)
     pre {
