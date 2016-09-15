@@ -4,33 +4,16 @@ ruleset v1_wrangler {
   meta {
     name "Wrangler Core"
     description <<
-<<<<<<< HEAD
-Wrangler Core Module
-
-    use module b507901x1 alias wrangler
-
-This Ruleset/Module provides a developer interface to the PICO (persistent computer object).
-When a PICO is created or authenticated this ruleset will be installed to provide essential
-services.
->>
-=======
       Wrangler Core Module,
       use example, use module v1_wrangler alias wrangler .
       This Ruleset/Module provides a developer interface to the PICO (persistent computer object).
       When a PICO is created or authenticated this ruleset will be installed to provide essential
       services.
     >>
->>>>>>> Picolab/master
     author "BYU Pico Lab"
     logging off
-<<<<<<< HEAD
-
     use module b16x42 alias system_credentials
     use module b507901x3 alias pds
-=======
-    use module b16x24 alias system_credentials
-    use module wrangler_pds alias pds
->>>>>>> Picolab/master
     // errors raised to.... unknown
     provides skyQuery, rulesets, rulesetsInfo, installRulesets, uninstallRulesets, //ruleset
     channel, channelAttributes, channelPolicy, channelType, //channel
