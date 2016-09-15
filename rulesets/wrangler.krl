@@ -543,11 +543,14 @@ ruleset v1_wrangler {
     checkPicoName = function(name){
           return = children();
           picos = return{"children"};
-          
+          /*
+          {"name":"closet","eci":"2C8457C0-76BF-11E6-B407-9BD5E71C24EA"}
+           */
           names = picos.none(function(child){
-            eci = child[0]; 
-            name_return = skyQuery(eci,meta:host(),"b507901x1.prod","name",noParam);
-            pico_name = name_return{"picoName"};
+            //eci = child{"eci"}; 
+            //name_return = skyQuery(eci,meta:host(),"b507901x1.prod","name",noParam);
+            //pico_name = name_return{"picoName"};
+            pico_name = child{"name"};
             (pico_name eq name)
             });
           (names).klog("checkPicoName : ");
@@ -839,7 +842,7 @@ ruleset v1_wrangler {
       name = event:attr("name").defaultsTo(randomPicoName(),standardError("missing event attr name, random word used instead."));
       prototype = event:attr("prototype").defaultsTo("devtools", standardError("missing event attr prototype"));           
     }
-   // if(checkPicoName(name)) then 
+    if(checkPicoName(name)) then 
     {
       createChild(name) with prototype_name = prototype; 
     }
