@@ -430,10 +430,10 @@ services.
                       "policy"     : "not implemented"
                     }
                     ], // we could instead use tuples  [["","","",""]], // array of arrrays [[name,type,attributes,policy]]
-      "prototypes" : [{// belongs in relationManager 
+      "prototypes" : [/*{// belongs in relationManager 
                       "url" : "https://raw.githubusercontent.com/burdettadam/Practice-with-KRL/master/prototype.json",
                       "prototype_name": "base_add_test"
-                      }],// add prototype by url
+                      }*/],// add prototype by url
       "children" : [
                     /*{
                       "name" : "testChild",
