@@ -17,9 +17,9 @@ ruleset v1_wrangler {
     // errors raised to.... unknown
     provides skyQuery, rulesets, rulesetsInfo, installRulesets, uninstallRulesets, //ruleset
     channel, channelAttributes, channelPolicy, channelType, //channel
-    children, parent, attributes, prototypes, name, profile, pico, checkPicoName, createChild, deleteChild, pico,
+    children, parent, attributes, prototypes, name, profile, pico, checkPicoName, randomPicoName, createChild, deleteChild, pico, 
     subscriptions, eciFromName, subscriptionAttributes,checkSubscriptionName, //subscription
-    standardError
+    standardError, decodeDefaults
     sharing on
   }
   global {
@@ -247,7 +247,7 @@ ruleset v1_wrangler {
     parent = pci:list_parent(self).defaultsTo("error", standardError("pci parent retrieval failed"));
     {
       'status' : (parent neq "error"),
-      'parent' : parent
+      'parent' : (parent neq "error") => parent | []
     }.klog("parent :");
   }
 
@@ -547,9 +547,6 @@ ruleset v1_wrangler {
           {"name":"closet","eci":"2C8457C0-76BF-11E6-B407-9BD5E71C24EA"}
            */
           names = picos.none(function(child){
-            //eci = child{"eci"}; 
-            //name_return = skyQuery(eci,meta:host(),"b507901x1.prod","name",noParam);
-            //pico_name = name_return{"picoName"};
             pico_name = child{"name"};
             (pico_name eq name)
             });
